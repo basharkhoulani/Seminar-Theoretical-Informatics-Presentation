@@ -1,0 +1,291 @@
+\PassOptionsToPackage{table}{xcolor}
+\documentclass{beamer}
+\mode<presentation>
+{
+  \usetheme{Madrid}
+  \usecolortheme{default}
+  \usefonttheme{serif}
+  \setbeamertemplate{navigation symbols}{}
+  \setbeamertemplate{caption}[numbered]
+} 
+
+\usepackage[english]{babel}
+\usepackage[utf8x]{inputenc}
+\usepackage[version=3]{mhchem}
+\usepackage{pgfpages}
+\usepackage{amsmath}
+\usepackage{csquotes}
+\usepackage{soul}
+\pgfpagesuselayout{resize to}[%
+  physical paper width=8in, physical paper height=6in]
+\title[Strassens Algorithmus]{Strassens Algorithmus \\ für die Matrixmultiplikation}
+\author{Bashar Khoulani}
+\institute[]{Universität Kassel}
+\date{\today}
+
+\begin{document}
+
+\begin{frame}
+    \titlepage
+\end{frame}
+
+\section{Einführung}
+\begin{frame}{Einführung --- Anwendungen}
+\uncover<+-> {
+Matrixmultiplikation in der Anwendung:
+\begin{itemize}[<+->]
+\item Lösung von linearen Gleichungssystemen
+\item Transitiven Abschluss eines Graphen berechnen
+\item Inverse und Determinante einer Matrix
+\item Kürzeste Pfade in einem Graphen finden
+\end{itemize}
+}
+\end{frame}
+
+\begin{frame}{Einführung --- Matrixmultiplikation}
+\uncover<+->{
+Matrixmultiplikation wie aus der linearen Algebra bekannt:
+}
+\uncover<+-> {
+\[
+\cdot: R^{n\times l} \times R^{l\times m} \rightarrow R^{n\times m}, (A, B) \mapsto C = A \cdot B
+\]
+\[\text{ mit } 
+c_{ij} = \sum_{k=1}^{l} a_{ik}b_{kj} \text{, für }i = 1, \dots, n \text{ und }j = 1, \dots, m
+\]
+}
+\uncover<+-> {
+Beispiel: $\cdot: \mathbb{Z}^{n\times l} \times \mathbb{Z}^{l\times m} \rightarrow \mathbb{Z}^{n\times m}, (A, B) \mapsto C = A \cdot B$
+\alt<3>{
+\[
+    \begin{pmatrix}
+    \; 1 & 2 & 3 \text{ }\\
+    \; 4 & 5 & 6 \text{ }\\
+    \; 7 & 8 & 9 \text{ }
+    \end{pmatrix} \cdot 
+    \begin{pmatrix}
+    \; 1 & 2 \text{ }\\
+    \; 3 & 4 \text{ }\\
+    \; 5 & 6 \text{ }
+    \end{pmatrix} =
+    \begin{pmatrix}
+    \; \phantom{22} & \; \phantom{28} \text{ } \\
+    \; \phantom{49} & \; \phantom{64} \text{ } \\
+    \; \phantom{76} & \; \phantom{100} \text{ } 
+    \end{pmatrix} 
+\]}{
+\alt<4>{
+\[
+    \left(\begin{array}{ccc}
+    \rowcolor{red!20}
+    1 & 2 & 3\\
+    4 & 5 & 6\\
+    7 & 8 & 9
+    \end{array}\right) \cdot 
+    \left(\begin{array}{>{\columncolor{blue!20}}cc}
+    1 & 2\\
+    3 & 4\\
+    5 & 6
+    \end{array}\right) =
+    \left(\begin{array}{cccc}
+    \cellcolor{green!10} 22 & \phantom{28} \\
+    \phantom{49} & \phantom{64} \\
+    \phantom{76} & \phantom{100} 
+    \end{array}\right) 
+\]}{
+\alt<5>{
+\[
+    \left(\begin{array}{ccc}
+    \rowcolor{red!20}
+    1 & 2 & 3\\
+    4 & 5 & 6\\
+    7 & 8 & 9
+    \end{array}\right) \cdot 
+    \left(\begin{array}{c>{\columncolor{blue!20}}c}
+    1 & 2\\
+    3 & 4\\
+    5 & 6
+    \end{array}\right) =
+    \left(\begin{array}{cccc}
+    22 & \cellcolor{green!10} 28 \\
+    \phantom{49} & \phantom{64} \\
+    \phantom{76} & \phantom{100} 
+    \end{array}\right) 
+\]}{
+\alt<6>{
+\[
+    \left(\begin{array}{ccc}
+    1 & 2 & 3\\
+    \rowcolor{red!20}
+    4 & 5 & 6\\
+    7 & 8 & 9
+    \end{array}\right) \cdot 
+    \left(\begin{array}{>{\columncolor{blue!20}}cc}
+    1 & 2\\
+    3 & 4\\
+    5 & 6
+    \end{array}\right) =
+    \left(\begin{array}{cccc}
+    22 & 28 \\
+    \cellcolor{green!10} 49 & \phantom{64} \\
+    \phantom{76} & \phantom{100} 
+    \end{array}\right) 
+\]
+}{
+\alt<7>{
+\[
+    \left(\begin{array}{ccc}
+    1 & 2 & 3\\
+    \rowcolor{red!20}
+    4 & 5 & 6\\
+    7 & 8 & 9
+    \end{array}\right) \cdot 
+    \left(\begin{array}{c>{\columncolor{blue!20}}c}
+    1 & 2\\
+    3 & 4\\
+    5 & 6
+    \end{array}\right) =
+    \left(\begin{array}{cccc}
+    22 & 28 \\
+    49 & \cellcolor{green!10} 64 \\
+    \phantom{76} & \phantom{100} 
+    \end{array}\right) 
+\]}{
+\alt<8>{
+\[
+    \left(\begin{array}{ccc}
+    1 & 2 & 3\\
+    4 & 5 & 6\\
+    \rowcolor{red!20}
+    7 & 8 & 9
+    \end{array}\right) \cdot 
+    \left(\begin{array}{>{\columncolor{blue!20}}cc}
+    1 & 2\\
+    3 & 4\\
+    5 & 6
+    \end{array}\right) =
+    \left(\begin{array}{cc}
+    22 & 28 \\
+    49 & 64 \\
+    \cellcolor{green!10} 76 & \phantom{100} 
+    \end{array}\right) 
+\]}{
+\[
+    \left(\begin{array}{ccc}
+    1 & 2 & 3\\
+    4 & 5 & 6\\
+    \rowcolor{red!20}
+    7 & 8 & 9
+    \end{array}\right) \cdot 
+    \left(\begin{array}{c>{\columncolor{blue!20}}c}
+    1 & 2\\
+    3 & 4\\
+    5 & 6
+    \end{array}\right) =
+    \left(\begin{array}{cc}
+    22 & 28 \\
+    49 & 64 \\
+    76 & \cellcolor{green!10} 100 
+    \end{array}\right) 
+\]}}}}}}}
+
+\pause[9]
+\end{frame}
+
+\begin{frame}{Einführung --- Algorithmen}
+\uncover<+-> {
+    In diesem Vortrag zu behandelnde Algorithmen:
+    \begin{itemize}[<+->]
+        \item \st{Der "naive" Algorithmus}
+        \begin{itemize}
+            \item[--] $\Theta(n^3)$
+        \end{itemize}
+        \item Divide-And-Conquer-Algorithmus
+        \begin{itemize}
+            \item[--] $\Theta(n^3)$
+        \end{itemize}
+        \item Strassens Algorithmus
+        \begin{itemize}
+            \item[--] $\Theta(n^{2.81})$
+        \end{itemize}
+    \end{itemize}
+}
+\end{frame}
+
+\begin{frame}{Divide-And-Conquer}
+    \uncover<+->{
+        Annahme: $A$, $B$ und $C$ sind $2^k \times 2^k$-Matrizen \\
+    }
+    \uncover<+->{
+        Partitioniere $A$, $B$ und $C$ folgendermaßen für $k \geq 1$:
+        \begin{equation}
+            A = \left(\begin{array}{cc}
+                    A_{11} & A_{12} \\
+                    A_{21} & A_{22} 
+                \end{array}\right), \,
+            B = \left(\begin{array}{cc}
+                    B_{11} & B_{12} \\
+                    B_{21} & B_{22} 
+                \end{array}\right), \,
+            C = \left(\begin{array}{cc}
+                    C_{11} & C_{12} \\
+                    C_{21} & C_{22} 
+            \end{array}\right)
+        \end{equation}
+    }
+    \uncover<+->{Dann gilt für das Produkt $A\cdot B = C$:
+        \begin{equation}
+            \left(\begin{array}{cc}
+                A_{11} & A_{12} \\
+                A_{21} & A_{22} 
+            \end{array}\right) \cdot
+            \left(\begin{array}{cc}
+                B_{11} & B_{12} \\
+                B_{21} & B_{22} 
+            \end{array}\right) =
+            \left(\begin{array}{cc}
+                C_{11} & C_{12} \\
+                C_{21} & C_{22} 
+            \end{array}\right)
+        \end{equation}
+    }
+    \uncover<+->{Mit
+    \begin{equation}
+        C_{11} = A_{11} \cdot B_{11} + A_{12} \cdot B_{21}
+    \end{equation}
+    \begin{equation}
+        C_{12} = A_{11} \cdot B_{12} + A_{12} \cdot B_{22}
+    \end{equation}
+    \begin{equation}
+        C_{21} = A_{21} \cdot B_{11} + A_{22} \cdot B_{21}
+    \end{equation}
+    \begin{equation}
+        C_{22} = A_{21} \cdot B_{12} + A_{22} \cdot B_{22}
+    \end{equation}
+    }
+\end{frame}
+
+
+\section{Strassens Algorithmus}
+\begin{frame}{Strassens Algorithmus}
+    
+\end{frame}
+
+\section{Bewertung}
+\begin{frame}{Bewertung}
+    
+\end{frame}
+
+\section{Ausblick}
+\begin{frame}{Ausblick}
+    
+\end{frame}
+
+\section{Literatur}
+\begin{frame}{Literatur}
+    \nocite{*}
+    \bibliographystyle{plain}
+    \bibliography{sem.bib}
+\end{frame}
+
+\end{document}
