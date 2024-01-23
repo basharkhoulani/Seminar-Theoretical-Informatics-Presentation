@@ -13,9 +13,20 @@
 \usepackage[utf8x]{inputenc}
 \usepackage[version=3]{mhchem}
 \usepackage{pgfpages}
+\usepackage{algorithm,algpseudocode}
 \usepackage{amsmath}
 \usepackage{csquotes}
 \usepackage{soul}
+\usepackage {enumerate}
+\usepackage{amsthm}
+\usepackage{tikz}
+\usepackage[T1]{fontenc}
+\usepackage{mathtools}
+\usepackage{caption}
+\usepackage{subcaption}
+\newcommand {\eps} {\varepsilon}
+\newcommand\hcancel[2][black]{\setbox0=\hbox{$#2$}%
+\rlap{\raisebox{.45\ht0}{\textcolor{#1}{\rule{\wd0}{1pt}}}}#2} 
 \pgfpagesuselayout{resize to}[%
   physical paper width=8in, physical paper height=6in]
 \title[Strassens Algorithmus]{Strassens Algorithmus \\ für die Matrixmultiplikation}
@@ -192,27 +203,41 @@ Beispiel: $\cdot: \mathbb{Z}^{n\times l} \times \mathbb{Z}^{l\times m} \rightarr
 \pause[9]
 \end{frame}
 
-\begin{frame}{Einführung --- Algorithmen}
-\uncover<+-> {
+\begin{frame}{Behandelnde Algorithmen}
     In diesem Vortrag zu behandelnde Algorithmen:
-    \begin{itemize}[<+->]
+    \begin{itemize}
         \item \st{Der "naive" Algorithmus}
         \begin{itemize}
             \item[--] $\Theta(n^3)$
         \end{itemize}
-        \item Divide-And-Conquer-Algorithmus
-        \begin{itemize}
-            \item[--] $\Theta(n^3)$
-        \end{itemize}
-        \item Strassens Algorithmus
-        \begin{itemize}
-            \item[--] $\Theta(n^{2.81})$
-        \end{itemize}
     \end{itemize}
-}
 \end{frame}
 
-\begin{frame}{Divide-And-Conquer}
+\begin{frame}{Einführung --- Master-Theorem}
+    \begin{theorem}[Master-Theorem]
+    Seien $a \geq 1$ und $b > 1$ Konstanten.
+    Sei $ f: \mathbb{R}^{\geq 0} \rightarrow \mathbb{R}^{\geq 0}$ eine Funktion, und sei $T : \mathbb{N} \rightarrow \mathbb{N}$ durch die folgende Rekursion definiert:
+    \[
+        T(n) = a \cdot T \left(\frac{n}{b}\right) + f(n)
+    \]
+    Dann gilt:
+    \begin{itemize}
+        
+        \item Wenn $f(n) \in \mathcal{O}(n^{log_b\;a-\eps}) $ für ein $\eps$ $>$ $0$, dann gilt $T(n) \in \Theta(n^{log_b\;a})$.
+        \tikz\node[opacity=0.25, align=left, inner xsep=0pt] {
+        \parbox[t]{\linewidth}{
+            \item Wenn $f(n) \in \Theta(n^{log_b\;a})$, dann gilt $T(n) \in \Theta(n^{log_b\;a}\;\lg\,n)$.
+        }};
+        \tikz\node[opacity=0.25, align=left, inner xsep=0pt] {
+        \parbox[t]{\linewidth}{
+            \item Wenn $f(n) \in \Omega(n^{log_b\;a+\eps}) $ für ein $\eps$ $>$ $0$ und $a\,f\left(\frac{n}{b}\right) \leq c\,f(n)$ für ein $c$ $<$ $1$ und hinreichend großen n, dann gilt $T(n) \in \Theta(f(n))$.
+        }};
+        
+    \end{itemize}
+    \end{theorem}
+\end{frame}
+
+\begin{frame}{Divide-And-Conquer --- Einführung}
     \uncover<+->{
         Annahme: $A$, $B$ und $C$ sind $2^k \times 2^k$-Matrizen \\
     }
@@ -231,6 +256,7 @@ Beispiel: $\cdot: \mathbb{Z}^{n\times l} \times \mathbb{Z}^{l\times m} \rightarr
                     C_{11} & C_{12} \\
                     C_{21} & C_{22} 
             \end{array}\right)
+            \label{equation}
         \end{equation}
     }
     \uncover<+->{Dann gilt für das Produkt $A\cdot B = C$:
@@ -265,20 +291,410 @@ Beispiel: $\cdot: \mathbb{Z}^{n\times l} \times \mathbb{Z}^{l\times m} \rightarr
     }
 \end{frame}
 
+\begin{frame}{Divide-And-Conquer --- Analyse}
+    Aufgestellte Rekurrenzgleichung:
+    \[ T(n) =  \begin{cases*}
+                    \Theta(1) & \text{n $\leq$ 1,} \\
+                    8 \cdot T\left(\frac{n}{2}\right) + \Theta(n^2) & \text{n $\geq$ 1} 
+                \end{cases*}
+    \]
+    \onslide<2->{
+    \begin{itemize}
+        \item  Wenn $f(n) \in \mathcal{O}(n^{log_b\;a-\eps}) $ für ein $\eps$ $>$ $0$, dann gilt $T(n) \in \Theta(n^{log_b\;a})$
+    \end{itemize}
+    \begin{align*}
+        a = 8,\;b = 2,\;f(n) \in \Theta(n^{2}) & \onslide<3->{\Rightarrow n^{log_b\;a} = n^{log_2\;8} = n^3 \\}
+        \onslide<4->{& \Rightarrow f(n) \in \mathcal{O}(n^{3-\eps}) \text{ mit } \eps = 1\\}
+        \onslide<5->{& \Rightarrow T(n) \in \Theta(n^{log_b\;a}) = \Theta(n^{log_2\;8}) = \Theta(n^{3})}
+    \end{align*}
+    \onslide<6->{$\rightarrow$ Keine Verbesserung}
+    }
+\end{frame}
+
+\begin{frame}{Behandelnde Algorithmen}
+    In diesem Vortrag zu behandelnde Algorithmen:
+    \begin{itemize}
+        \item \st{Der "naive" Algorithmus}
+        \begin{itemize}
+            \item $\Theta(n^3)$
+        \end{itemize}
+        \item \st{Divide-And-Conquer-Algorithmus}
+        \begin{itemize}
+            \item $\Theta(n^3)$
+        \end{itemize}
+    \end{itemize}
+\end{frame}
+
+
+
 
 \section{Strassens Algorithmus}
-\begin{frame}{Strassens Algorithmus}
-    
+\begin{frame}{Strassens Algorithmus --- Einführung}
+    \onslide<1-> {Annahme: $A$, $B$ und $C$ sind $2^k \times 2^k$-Matrizen \\}
+    \onslide<2-> {Partitioniere $A$, $B$ und $C$ wie in DAC, dann ist mit:}
+    \begin{align*} 
+        \onslide<3-> {P_{1} = A_{11} \cdot \left(B_{12} - B_{22}\right) = \; & \phantom{ a+ } A_{11} \cdot B_{12} - A_{11} \cdot B_{22} \\}
+        \onslide<4-> {P_{2} = B_{22} \cdot \left(A_{11} + A_{12}\right) = \; & \phantom{ a+ } A_{11} \cdot B_{22} + A_{12} \cdot B_{22} \\}
+        \onslide<5-> {P_{3} = B_{11} \cdot \left(A_{21} + A_{22}\right) = \; & \phantom{ a+ } A_{21} \cdot B_{11} + A_{22} \cdot B_{11} \\}
+        \onslide<6-> {P_{4} = A_{22} \cdot \left(B_{21} - B_{11}\right) = \; & \phantom{ a+ } A_{22} \cdot B_{21} - A_{22} \cdot B_{11} \\}
+        \onslide<7-> {P_{5} = \left(B_{11} + B_{22}\right) \cdot \left(A_{11} + A_{22}\right) = \; & \phantom{ a+ } A_{11} \cdot B_{11} + A_{11} \cdot B_{22} \\}
+        \onslide<7-> {& + A_{22} \cdot B_{11} + A_{22} \cdot B_{22} \\}
+        \onslide<8-> {P_{6} = \left(B_{21} + B_{22}\right) \cdot \left(A_{12} - A_{22}\right) = \; & \phantom{ a+ } A_{12} \cdot B_{21} + A_{12} \cdot B_{22} \\}
+        \onslide<8-> {& - A_{22} \cdot B_{21} - A_{22} \cdot B_{22} \\}
+        \onslide<9-> {P_{7} = \left(A_{11} - A_{21}\right) \cdot \left(B_{11} + B_{12}\right) = \; & \phantom{ a+ } A_{11} \cdot B_{11} + A_{11} \cdot B_{12}\\}
+        \onslide<9-> {& - A_{21} \cdot B_{11} - A_{21} \cdot B_{12} \\}
+    \end{align*}
+\end{frame}
+
+\begin{frame}{Strassens Algorithmus --- Analyse}
+    Aufgestellte Rekurrenzgleichung:
+    \[ T(n) =  \begin{cases*}
+                    \Theta(1) & \text{n $\leq$ 1,} \\
+                    7 \cdot T\left(\frac{n}{2}\right) + \Theta(n^2) & \text{n $\geq$ 1} 
+                \end{cases*}
+    \]
+    \onslide<2->{
+    \begin{itemize}
+        \item  Wenn $f(n) \in \mathcal{O}(n^{log_b\;a-\eps}) $ für ein $\eps$ $>$ $0$, dann gilt $T(n) \in \Theta(n^{log_b\;a})$
+    \end{itemize}
+    \begin{align*}
+        a = 7,\;b = 2,\;f(n) \in \Theta(n^{2}) & \onslide<3->{\Rightarrow n^{log_b\;a} = n^{log_2\;7} = n^{lg\;7} \\}
+        \onslide<4->{(\text{es gilt }2,80 < lg\;7 < 2,81)& \Rightarrow f(n) \in \mathcal{O}(n^{lg\;7-\eps}) \text{ mit } \eps = 0,8\\}
+        \onslide<5->{& \Rightarrow T(n) \in \Theta(n^{log_b\;a}) = \Theta(n^{log_2\;7}) = \Theta(n^{lg\;7})}
+    \end{align*}
+    \onslide<6->{$\rightarrow$ Verbesserung von von $\Theta(n^{3})$ auf $\Theta(n^{lg\;7}) = \Theta(n^{2,81})$!}
+    }
+\end{frame}
+
+\begin{frame}{Strassens Algorithmus --- Endergebnis}
+Dann gilt für das Produkt $A\cdot B = C$:
+\uncover<+-> {
+\alt<1> {
+        \begin{align*}
+            A\cdot B =
+            \left(\begin{array}{cc}
+                P_{4} + P_{5} + P_{6} - P_{2} & P_{1} + P_{2} \\
+                P_{3} + P_{4} & P_{1} + P_{5} - P_{3} - P_{7} 
+            \end{array}\right)
+        \end{align*}} {
+        \alt<2> {
+            \begin{align*}
+                A\cdot B =
+                \left(\begin{array}{cc}
+                    \cellcolor{green!10} P_{4} + P_{5} + P_{6} - P_{2} & P_{1} + P_{2} \\
+                    P_{3} + P_{4} & P_{1} + P_{5} - P_{3} - P_{7} 
+                \end{array}\right)
+            \end{align*}
+        
+            \begin{align*}
+                A_{22} \cdot B_{21} - A_{22} \cdot B_{11} + A_{11} \cdot B_{11} + A_{11} \cdot B_{22} \\ 
+                + A_{22} \cdot B_{11} + A_{22} \cdot B_{22} + A_{12} \cdot B_{21} + A_{12} \cdot B_{22} \\ 
+                - A_{22} \cdot B_{21} - A_{22} \cdot B_{22} - A_{11} \cdot B_{22} - A_{12} \cdot B_{22} \\
+                \;= &\;A_{11} \cdot B_{11} + A_{12} \cdot B_{21}
+            \end{align*}} {
+        \alt<3> {
+            \begin{align*}
+                A\cdot B =
+                \left(\begin{array}{cc}
+                    \cellcolor{green!10} P_{4} + P_{5} + P_{6} - P_{2} & P_{1} + P_{2} \\
+                    P_{3} + P_{4} & P_{1} + P_{5} - P_{3} - P_{7} 
+                \end{array}\right)
+            \end{align*}
+            
+            \begin{align*}
+                \hcancel[red]{A_{22} \cdot B_{21}} - A_{22} \cdot B_{11} + A_{11} \cdot B_{11} + A_{11} \cdot B_{22} & \\ 
+                + A_{22} \cdot B_{11} + A_{22} \cdot B_{22} + A_{12} \cdot B_{21} + A_{12} \cdot B_{22} & \\ 
+                - \hcancel[red]{A_{22} \cdot B_{21}} - A_{22} \cdot B_{22} - A_{11} \cdot B_{22} - A_{12} \cdot B_{22} & \\
+                \;= &\;A_{11} \cdot B_{11} + A_{12} \cdot B_{21}
+            \end{align*}}{
+            \alt<4>{
+                \begin{align*}
+                    A\cdot B =
+                    \left(\begin{array}{cc}
+                        \cellcolor{green!10} P_{4} + P_{5} + P_{6} - P_{2} & P_{1} + P_{2} \\
+                        P_{3} + P_{4} & P_{1} + P_{5} - P_{3} - P_{7} 
+                    \end{array}\right)
+                \end{align*}
+                \begin{align*}
+                    \hcancel[red]{A_{22} \cdot B_{21}} - \hcancel[red]{A_{22} \cdot B_{11}} + A_{11} \cdot B_{11} + A_{11} \cdot B_{22} & \\ 
+                    + \hcancel[red]{A_{22} \cdot B_{11}} + A_{22} \cdot B_{22} + A_{12} \cdot B_{21} + A_{12} \cdot B_{22} & \\ 
+                    - \hcancel[red]{A_{22} \cdot B_{21}} - A_{22} \cdot B_{22} - A_{11} \cdot B_{22} - A_{12} \cdot B_{22} & \\
+                    \;= &\;A_{11} \cdot B_{11} + A_{12} \cdot B_{21}
+                \end{align*}}{
+            \alt<5>{
+                \begin{align*}
+                    A\cdot B =
+                    \left(\begin{array}{cc}
+                        \cellcolor{green!10} P_{4} + P_{5} + P_{6} - P_{2} & P_{1} + P_{2} \\
+                        P_{3} + P_{4} & P_{1} + P_{5} - P_{3} - P_{7} 
+                    \end{array}\right)
+                \end{align*}
+                \begin{align*}
+                    \hcancel[red]{A_{22} \cdot B_{21}} - \hcancel[red]{A_{22} \cdot B_{11}} + A_{11} \cdot B_{11} + \hcancel[red]{A_{11} \cdot B_{22}} & \\ 
+                    + \hcancel[red]{A_{22} \cdot B_{11}} + A_{22} \cdot B_{22} + A_{12} \cdot B_{21} + A_{12} \cdot B_{22} & \\ 
+                    - \hcancel[red]{A_{22} \cdot B_{21}} - A_{22} \cdot B_{22} - \hcancel[red]{A_{11} \cdot B_{22}} - A_{12} \cdot B_{22} & \\
+                    \;= &\;A_{11} \cdot B_{11} + A_{12} \cdot B_{21}
+                \end{align*}} {
+                \alt<6>{
+                    \begin{align*}
+                        A\cdot B =
+                        \left(\begin{array}{cc}
+                            \cellcolor{green!10} P_{4} + P_{5} + P_{6} - P_{2} & P_{1} + P_{2} \\
+                            P_{3} + P_{4} & P_{1} + P_{5} - P_{3} - P_{7} 
+                        \end{array}\right)
+                    \end{align*}
+                    \begin{align*}
+                        \hcancel[red]{A_{22} \cdot B_{21}} - \hcancel[red]{A_{22} \cdot B_{11}} + A_{11} \cdot B_{11} + \hcancel[red]{A_{11} \cdot B_{22}} & \\ 
+                        + \hcancel[red]{A_{22} \cdot B_{11}} + \hcancel[red]{A_{22} \cdot B_{22}} + A_{12} \cdot B_{21} + A_{12} \cdot B_{22} & \\ 
+                        - \hcancel[red]{A_{22} \cdot B_{21}} - \hcancel[red]{A_{22} \cdot B_{22}} - \hcancel[red]{A_{11} \cdot B_{22}} - A_{12} \cdot B_{22} & \\
+                        \;= &\;A_{11} \cdot B_{11} + A_{12} \cdot B_{21}
+                    \end{align*}} { 
+                \alt<7> {\begin{align*}
+                    A\cdot B =
+                    \left(\begin{array}{cc}
+                        \cellcolor{green!10} P_{4} + P_{5} + P_{6} - P_{2} & P_{1} + P_{2} \\
+                        P_{3} + P_{4} & P_{1} + P_{5} - P_{3} - P_{7} 
+                    \end{array}\right)
+                \end{align*}
+                \begin{align*}
+                    \hcancel[red]{A_{22} \cdot B_{21}} - \hcancel[red]{A_{22} \cdot B_{11}} + A_{11} \cdot B_{11} + \hcancel[red]{A_{11} \cdot B_{22}} & \\ 
+                    + \hcancel[red]{A_{22} \cdot B_{11}} + \hcancel[red]{A_{22} \cdot B_{22}} + A_{12} \cdot B_{21} + \hcancel[red]{A_{12} \cdot B_{22}} & \\ 
+                    - \hcancel[red]{A_{22} \cdot B_{21}} - \hcancel[red]{A_{22} \cdot B_{22}} - \hcancel[red]{A_{11} \cdot B_{22}} - \hcancel[red]{A_{12} \cdot B_{22}} & \\
+                    \;= &\;A_{11} \cdot B_{11} + A_{12} \cdot B_{21}
+                \end{align*}}{\alt<8>{
+                \begin{align*}
+                    A\cdot B =
+                    \left(\begin{array}{cc}
+                         P_{4} + P_{5} + P_{6} - P_{2} & \cellcolor{green!10} P_{1} + P_{2} \\
+                        P_{3} + P_{4} & P_{1} + P_{5} - P_{3} - P_{7} 
+                    \end{array}\right)
+                \end{align*}}{
+                \alt<9>{\begin{align*}
+                    A\cdot B =
+                    \left(\begin{array}{cc}
+                        P_{4} + P_{5} + P_{6} - P_{2} & \cellcolor{green!10}  P_{1} + P_{2} \\
+                        P_{3} + P_{4} & P_{1} + P_{5} - P_{3} - P_{7} 
+                    \end{array}\right)
+                \end{align*}
+                \begin{align*}
+                A_{11} \cdot B_{12} - A_{11} \cdot B_{22} \\ 
+                + A_{11} \cdot B_{22} + A_{12} \cdot B_{22} \\ 
+                \;= &\;A_{11} \cdot B_{12} + A_{12} \cdot B_{22}
+                \end{align*}}{
+                \alt<10> {\begin{align*}
+                    A\cdot B =
+                    \left(\begin{array}{cc}
+                        P_{4} + P_{5} + P_{6} - P_{2} & \cellcolor{green!10}  P_{1} + P_{2} \\
+                        P_{3} + P_{4} & P_{1} + P_{5} - P_{3} - P_{7} 
+                    \end{array}\right)
+                \end{align*}
+                \begin{align*}
+                A_{11} \cdot B_{12} - \hcancel[red]{A_{11} \cdot B_{22}} \\ 
+                + \hcancel[red]{A_{11} \cdot B_{22}} + A_{12} \cdot B_{22} \\ 
+                \;= &\;A_{11} \cdot B_{12} + A_{12} \cdot B_{22}
+                \end{align*}}{
+                \alt<11>{\begin{align*}
+                    A\cdot B =
+                    \left(\begin{array}{cc}
+                        P_{4} + P_{5} + P_{6} - P_{2} &   P_{1} + P_{2} \\
+                        \cellcolor{green!10} P_{3} + P_{4} & P_{1} + P_{5} - P_{3} - P_{7} 
+                    \end{array}\right)
+                \end{align*}
+                \begin{align*}
+                A_{21} \cdot B_{11} + A_{22} \cdot B_{11} \\ 
+                + A_{22} \cdot B_{21} - A_{22} \cdot B_{11} \\ 
+                \;= &\;A_{21} \cdot B_{11} + A_{22} \cdot B_{21}
+                \end{align*}}{\alt<12>{\begin{align*}
+                    A\cdot B =
+                    \left(\begin{array}{cc}
+                        P_{4} + P_{5} + P_{6} - P_{2} &   P_{1} + P_{2} \\
+                        \cellcolor{green!10} P_{3} + P_{4} & P_{1} + P_{5} - P_{3} - P_{7} 
+                    \end{array}\right)
+                \end{align*}
+                \begin{align*}
+                A_{21} \cdot B_{11} + \hcancel[red]{A_{22} \cdot B_{11}} \\ 
+                + A_{22} \cdot B_{21} - \hcancel[red]{A_{22} \cdot B_{11}} \\ 
+                \;= &\;A_{21} \cdot B_{11} + A_{22} \cdot B_{21}
+                \end{align*}}{\alt<13>{\begin{align*}
+                A\cdot B =
+                \left(\begin{array}{cc}
+                    P_{4} + P_{5} + P_{6} - P_{2} & P_{1} + P_{2} \\
+                    P_{3} + P_{4} & \cellcolor{green!10} P_{1} + P_{5} - P_{3} - P_{7} 
+                \end{array}\right)
+            \end{align*}
+        
+            \begin{align*}
+                A_{11} \cdot B_{12} - A_{11} \cdot B_{22} + A_{11} \cdot B_{11} + A_{11} \cdot B_{22} \\ 
+                + A_{22} \cdot B_{11} + A_{22} \cdot B_{22} - A_{21} \cdot B_{11} - A_{22} \cdot B_{11} \\ 
+                - A_{11} \cdot B_{11} - A_{11} \cdot B_{12} + A_{21} \cdot B_{11} + A_{21} \cdot B_{12} \\
+                \;= &\;A_{21} \cdot B_{12} + A_{22} \cdot B_{22}
+            \end{align*}}{
+            \alt<14>{
+                \begin{align*}
+                    A\cdot B =
+                    \left(\begin{array}{cc}
+                        P_{4} + P_{5} + P_{6} - P_{2} & P_{1} + P_{2} \\
+                        P_{3} + P_{4} & \cellcolor{green!10} P_{1} + P_{5} - P_{3} - P_{7} 
+                    \end{array}\right)
+                \end{align*}
+            
+                \begin{align*}
+                    \hcancel[red]{A_{11} \cdot B_{12}} - A_{11} \cdot B_{22} + A_{11} \cdot B_{11} + A_{11} \cdot B_{22} \\ 
+                    + A_{22} \cdot B_{11} + A_{22} \cdot B_{22} - A_{21} \cdot B_{11} - A_{22} \cdot B_{11} \\ 
+                    - A_{11} \cdot B_{11} - \hcancel[red]{A_{11} \cdot B_{12}} + A_{21} \cdot B_{11} + A_{21} \cdot B_{12} \\
+                    \;= &\;A_{21} \cdot B_{12} + A_{22} \cdot B_{22}
+                \end{align*}
+            }{ 
+            \alt<15>{\begin{align*}
+                    A\cdot B =
+                    \left(\begin{array}{cc}
+                        P_{4} + P_{5} + P_{6} - P_{2} & P_{1} + P_{2} \\
+                        P_{3} + P_{4} & \cellcolor{green!10} P_{1} + P_{5} - P_{3} - P_{7} 
+                    \end{array}\right)
+                \end{align*}
+            
+                \begin{align*}
+                    \hcancel[red]{A_{11} \cdot B_{12}} - \hcancel[red]{A_{11} \cdot B_{22}} + A_{11} \cdot B_{11} + \hcancel[red]{A_{11} \cdot B_{22}} \\ 
+                    + A_{22} \cdot B_{11} + A_{22} \cdot B_{22} - A_{21} \cdot B_{11} - A_{22} \cdot B_{11} \\ 
+                    - A_{11} \cdot B_{11} - \hcancel[red]{A_{11} \cdot B_{12}} + A_{21} \cdot B_{11} + A_{21} \cdot B_{12} \\
+                    \;= &\;A_{21} \cdot B_{12} + A_{22} \cdot B_{22}
+                \end{align*}}{
+                \alt<16>{\begin{align*}
+                    A\cdot B =
+                    \left(\begin{array}{cc}
+                        P_{4} + P_{5} + P_{6} - P_{2} & P_{1} + P_{2} \\
+                        P_{3} + P_{4} & \cellcolor{green!10} P_{1} + P_{5} - P_{3} - P_{7} 
+                    \end{array}\right)
+                \end{align*}
+            
+                \begin{align*}
+                    \hcancel[red]{A_{11} \cdot B_{12}} - \hcancel[red]{A_{11} \cdot B_{22}} + \hcancel[red]{A_{11} \cdot B_{11}} + \hcancel[red]{A_{11} \cdot B_{22}} \\ 
+                    + A_{22} \cdot B_{11} + A_{22} \cdot B_{22} - A_{21} \cdot B_{11} - A_{22} \cdot B_{11} \\ 
+                    - \hcancel[red]{A_{11} \cdot B_{11}} - \hcancel[red]{A_{11} \cdot B_{12}} + A_{21} \cdot B_{11} + A_{21} \cdot B_{12} \\
+                    \;= &\;A_{21} \cdot B_{12} + A_{22} \cdot B_{22}
+                \end{align*}}{
+                
+                \alt<17>{\begin{align*}
+                    A\cdot B =
+                    \left(\begin{array}{cc}
+                        P_{4} + P_{5} + P_{6} - P_{2} & P_{1} + P_{2} \\
+                        P_{3} + P_{4} & \cellcolor{green!10} P_{1} + P_{5} - P_{3} - P_{7} 
+                    \end{array}\right)
+                \end{align*}
+            
+                \begin{align*}
+                    \hcancel[red]{A_{11} \cdot B_{12}} - \hcancel[red]{A_{11} \cdot B_{22}} + \hcancel[red]{A_{11} \cdot B_{11}} + \hcancel[red]{A_{11} \cdot B_{22}} \\ 
+                    + \hcancel[red]{A_{22} \cdot B_{11}} + A_{22} \cdot B_{22} - A_{21} \cdot B_{11} - \hcancel[red]{A_{22} \cdot B_{11}} \\ 
+                    - \hcancel[red]{A_{11} \cdot B_{11}} - \hcancel[red]{A_{11} \cdot B_{12}} + A_{21} \cdot B_{11} + A_{21} \cdot B_{12} \\
+                    \;= &\;A_{21} \cdot B_{12} + A_{22} \cdot B_{22}
+                \end{align*}}{
+                \alt<18>{\begin{align*}
+                    A\cdot B =
+                    \left(\begin{array}{cc}
+                        P_{4} + P_{5} + P_{6} - P_{2} & P_{1} + P_{2} \\
+                        P_{3} + P_{4} & \cellcolor{green!10} P_{1} + P_{5} - P_{3} - P_{7} 
+                    \end{array}\right)
+                \end{align*}
+            
+                \begin{align*}
+                    \hcancel[red]{A_{11} \cdot B_{12}} - \hcancel[red]{A_{11} \cdot B_{22}} + \hcancel[red]{A_{11} \cdot B_{11}} + \hcancel[red]{A_{11} \cdot B_{22}} \\ 
+                    + \hcancel[red]{A_{22} \cdot B_{11}} + A_{22} \cdot B_{22} - \hcancel[red]{A_{21} \cdot B_{11}} - \hcancel[red]{A_{22} \cdot B_{11}} \\ 
+                    - \hcancel[red]{A_{11} \cdot B_{11}} - \hcancel[red]{A_{11} \cdot B_{12}} + \hcancel[red]{A_{21} \cdot B_{11}} + A_{21} \cdot B_{12} \\
+                    \;= &\;A_{21} \cdot B_{12} + A_{22} \cdot B_{22}
+                \end{align*}}{
+                \begin{align*}
+                    A\cdot B =
+                    \left(\begin{array}{cc}
+                        P_{4} + P_{5} + P_{6} - P_{2} & P_{1} + P_{2} \\
+                        P_{3} + P_{4} & \cellcolor{green!10} P_{1} + P_{5} - P_{3} - P_{7} 
+                    \end{array}\right)
+                \end{align*}
+            
+                \begin{align*}
+                    \hcancel[red]{A_{11} \cdot B_{12}} - \hcancel[red]{A_{11} \cdot B_{22}} + \hcancel[red]{A_{11} \cdot B_{11}} + \hcancel[red]{A_{11} \cdot B_{22}} \\ 
+                    + \hcancel[red]{A_{22} \cdot B_{11}} + A_{22} \cdot B_{22} - \hcancel[red]{A_{21} \cdot B_{11}} - \hcancel[red]{A_{22} \cdot B_{11}} \\ 
+                    - \hcancel[red]{A_{11} \cdot B_{11}} - \hcancel[red]{A_{11} \cdot B_{12}} + \hcancel[red]{A_{21} \cdot B_{11}} + A_{21} \cdot B_{12} \\
+                    \;= &\;A_{21} \cdot B_{12} + A_{22} \cdot B_{22}
+                \end{align*}
+                $\rightarrow$ "naive" Schulemethode $\Leftrightarrow$ DAC $\Leftrightarrow$ Strassens Algorithmus
+}}}}}}}}}}}}}}}}}}}
+\pause[19]
 \end{frame}
 
 \section{Bewertung}
 \begin{frame}{Bewertung}
+
+    \alt<1-2> {
+    \uncover<+-> {
+        \begin{figure}[H]
+            \centering
+            \begin{subfigure}[b]{0.4\textwidth}
+                \includegraphics[width=\textwidth]{128Without.PNG}
+                \caption{Ohne Basisfall-Modifikation}
+            \end{subfigure}
+            \begin{subfigure}[b]{0.4\textwidth}
+                \includegraphics[width=\textwidth]{128With.PNG}
+                \caption{Mit Basisfall-Modifikation}
+            \end{subfigure}
+        \end{figure}
+    }
+    \uncover<+-> {
+        \begin{figure}[H]
+            \centering
+            \begin{subfigure}[b]{0.4\textwidth}
+                \includegraphics[width=\textwidth]{256Without.PNG}
+                \caption{Ohne Basisfall-Modifikation}
+            \end{subfigure}
+            \begin{subfigure}[b]{0.4\textwidth}
+                \includegraphics[width=\textwidth]{256With.PNG}
+                \caption{Mit Basisfall-Modifikation}
+            \end{subfigure}
+        \end{figure}
+    }
+    }{
     
+    \uncover<3-> {
+        \begin{figure}[H]
+            \centering
+            \begin{subfigure}[b]{0.4\textwidth}
+                \includegraphics[width=\textwidth]{512Without.PNG}
+                \caption{Ohne Basisfall-Modifikation}
+            \end{subfigure}
+            \begin{subfigure}[b]{0.4\textwidth}
+                \includegraphics[width=\textwidth]{512With.PNG}
+                \caption{Mit Basisfall-Modifikation}
+            \end{subfigure}
+        \end{figure}
+    }
+    \uncover<4-> {
+        \begin{figure}[H]
+            \centering
+            \begin{subfigure}[b]{0.4\textwidth}
+                \includegraphics[width=\textwidth]{1024Without.PNG}
+                \caption{Ohne Basisfall-Modifikation}
+            \end{subfigure}
+            \begin{subfigure}[b]{0.4\textwidth}
+                \includegraphics[width=\textwidth]{1024With.PNG}
+                \caption{Mit Basisfall-Modifikation}
+            \end{subfigure}
+        \end{figure}
+    }
+    }
+    \pause[4]
 \end{frame}
 
 \section{Ausblick}
 \begin{frame}{Ausblick}
+    $\rightarrow$ Modifikation des Algorithmus notwendig
+    \bigskip
     
+    $\rightarrow$ Parallelismus machbar
+    
+    \bigskip
+    $\rightarrow$ Coppersmith und Winograd in $O(n^{2,376})$
+    
+    \bigskip
+    \qquad $\rightharpoonup$ Sehr unpraktisch
 \end{frame}
 
 \section{Literatur}
