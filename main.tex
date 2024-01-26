@@ -1,5 +1,5 @@
 \PassOptionsToPackage{table}{xcolor}
-\documentclass{beamer}
+\documentclass[aspectratio=169]{beamer}
 \mode<presentation>
 {
   \usetheme{Madrid}
@@ -8,7 +8,6 @@
   \setbeamertemplate{navigation symbols}{}
   \setbeamertemplate{caption}[numbered]
 } 
-
 \usepackage[english]{babel}
 \usepackage[utf8x]{inputenc}
 \usepackage[version=3]{mhchem}
@@ -25,10 +24,10 @@
 \usepackage{caption}
 \usepackage{subcaption}
 \newcommand {\eps} {\varepsilon}
+\newcommand{\highlight}[1]{%
+  \colorbox{red!50}{$\displaystyle#1$}}
 \newcommand\hcancel[2][black]{\setbox0=\hbox{$#2$}%
 \rlap{\raisebox{.45\ht0}{\textcolor{#1}{\rule{\wd0}{1pt}}}}#2} 
-\pgfpagesuselayout{resize to}[%
-  physical paper width=8in, physical paper height=6in]
 \title[Strassens Algorithmus]{Strassens Algorithmus \\ für die Matrixmultiplikation}
 \author{Bashar Khoulani}
 \institute[]{Universität Kassel}
@@ -240,26 +239,11 @@ Beispiel: $\cdot: \mathbb{Z}^{n\times l} \times \mathbb{Z}^{l\times m} \rightarr
 \begin{frame}{Divide-And-Conquer --- Einführung}
     \uncover<+->{
         Annahme: $A$, $B$ und $C$ sind $2^k \times 2^k$-Matrizen \\
-    }
-    \uncover<+->{
-        Partitioniere $A$, $B$ und $C$ folgendermaßen für $k \geq 1$:
-        \begin{equation}
-            A = \left(\begin{array}{cc}
-                    A_{11} & A_{12} \\
-                    A_{21} & A_{22} 
-                \end{array}\right), \,
-            B = \left(\begin{array}{cc}
-                    B_{11} & B_{12} \\
-                    B_{21} & B_{22} 
-                \end{array}\right), \,
-            C = \left(\begin{array}{cc}
-                    C_{11} & C_{12} \\
-                    C_{21} & C_{22} 
-            \end{array}\right)
-            \label{equation}
-        \end{equation}
-    }
-    \uncover<+->{Dann gilt für das Produkt $A\cdot B = C$:
+        \bigskip
+}
+    \uncover<+->{Partitioniere $A$, $B$ und $C$ für $k \geq 1$ wie in \ref{partition}.  \\
+        \bigskip
+        Dann gilt für das Produkt $A\cdot B = C$:
         \begin{equation}
             \left(\begin{array}{cc}
                 A_{11} & A_{12} \\
@@ -273,6 +257,7 @@ Beispiel: $\cdot: \mathbb{Z}^{n\times l} \times \mathbb{Z}^{l\times m} \rightarr
                 C_{11} & C_{12} \\
                 C_{21} & C_{22} 
             \end{array}\right)
+        \label{partition}
         \end{equation}
     }
     \uncover<+->{Mit
@@ -303,9 +288,9 @@ Beispiel: $\cdot: \mathbb{Z}^{n\times l} \times \mathbb{Z}^{l\times m} \rightarr
         \item  Wenn $f(n) \in \mathcal{O}(n^{log_b\;a-\eps}) $ für ein $\eps$ $>$ $0$, dann gilt $T(n) \in \Theta(n^{log_b\;a})$
     \end{itemize}
     \begin{align*}
-        a = 8,\;b = 2,\;f(n) \in \Theta(n^{2}) & \onslide<3->{\Rightarrow n^{log_b\;a} = n^{log_2\;8} = n^3 \\}
-        \onslide<4->{& \Rightarrow f(n) \in \mathcal{O}(n^{3-\eps}) \text{ mit } \eps = 1\\}
-        \onslide<5->{& \Rightarrow T(n) \in \Theta(n^{log_b\;a}) = \Theta(n^{log_2\;8}) = \Theta(n^{3})}
+        a = 8,\;b = 2,\;f(n) \in \Theta(n^{2}) & \onslide<3->{\rightsquigarrow n^{log_b\;a} = n^{log_2\;8} = n^3 \\}
+        \onslide<4->{& \rightsquigarrow f(n) \in \mathcal{O}(n^{3-\eps}) \text{ mit } \eps = 1\\}
+        \onslide<5->{& \rightsquigarrow T(n) \in \Theta(n^{log_b\;a}) = \Theta(n^{log_2\;8}) = \Theta(n^{3})}
     \end{align*}
     \onslide<6->{$\rightarrow$ Keine Verbesserung}
     }
@@ -329,45 +314,53 @@ Beispiel: $\cdot: \mathbb{Z}^{n\times l} \times \mathbb{Z}^{l\times m} \rightarr
 
 
 \section{Strassens Algorithmus}
+
+\begin{frame}{Strassens Algorithmus --- Intuition}
+    Bewusste Kompromisse:
+    \bigskip
+    \begin{itemize}
+        \item Reduzierung der Multiplikationen 
+        \item Erhöhung der Additionen
+    \end{itemize}
+
+    \bigskip
+    \bigskip
+    \uncover<2-> {
+    
+    Beispiel:
+    \begin{center}
+         $x^2 - y^2 = x \cdot x - y \cdot y = (x - y) \cdot (x + y)$ 
+    \end{center}
+   
+    }
+    
+    
+\end{frame}
+
+
 \begin{frame}{Strassens Algorithmus --- Einführung}
     \onslide<1-> {Annahme: $A$, $B$ und $C$ sind $2^k \times 2^k$-Matrizen \\}
     \onslide<2-> {Partitioniere $A$, $B$ und $C$ wie in DAC, dann ist mit:}
     \begin{align*} 
-        \onslide<3-> {P_{1} = A_{11} \cdot \left(B_{12} - B_{22}\right) = \; & \phantom{ a+ } A_{11} \cdot B_{12} - A_{11} \cdot B_{22} \\}
-        \onslide<4-> {P_{2} = B_{22} \cdot \left(A_{11} + A_{12}\right) = \; & \phantom{ a+ } A_{11} \cdot B_{22} + A_{12} \cdot B_{22} \\}
-        \onslide<5-> {P_{3} = B_{11} \cdot \left(A_{21} + A_{22}\right) = \; & \phantom{ a+ } A_{21} \cdot B_{11} + A_{22} \cdot B_{11} \\}
-        \onslide<6-> {P_{4} = A_{22} \cdot \left(B_{21} - B_{11}\right) = \; & \phantom{ a+ } A_{22} \cdot B_{21} - A_{22} \cdot B_{11} \\}
-        \onslide<7-> {P_{5} = \left(B_{11} + B_{22}\right) \cdot \left(A_{11} + A_{22}\right) = \; & \phantom{ a+ } A_{11} \cdot B_{11} + A_{11} \cdot B_{22} \\}
-        \onslide<7-> {& + A_{22} \cdot B_{11} + A_{22} \cdot B_{22} \\}
-        \onslide<8-> {P_{6} = \left(B_{21} + B_{22}\right) \cdot \left(A_{12} - A_{22}\right) = \; & \phantom{ a+ } A_{12} \cdot B_{21} + A_{12} \cdot B_{22} \\}
-        \onslide<8-> {& - A_{22} \cdot B_{21} - A_{22} \cdot B_{22} \\}
-        \onslide<9-> {P_{7} = \left(A_{11} - A_{21}\right) \cdot \left(B_{11} + B_{12}\right) = \; & \phantom{ a+ } A_{11} \cdot B_{11} + A_{11} \cdot B_{12}\\}
-        \onslide<9-> {& - A_{21} \cdot B_{11} - A_{21} \cdot B_{12} \\}
+        \onslide<3-> {P_{1} = A_{11} \cdot \left(B_{12} - B_{22}\right) \; \; \; \; & P_{2} = B_{22} \cdot \left(A_{11} + A_{12}\right) \\}
+        \onslide<4-> {P_{3} = B_{11} \cdot \left(A_{21} + A_{22}\right) \; \; \; \; & P_{4} = A_{22} \cdot \left(B_{21} - B_{11}\right) \\}
+        \onslide<5-> {P_{5} = \left(B_{11} + B_{22}\right) \cdot \left(A_{11} + A_{22}\right) \; \; \; \; & P_{6} = \left(B_{21} + B_{22}\right) \cdot \left(A_{12} - A_{22}\right) \\}
+        \onslide<6-> {P_{7} = \left(A_{11} - A_{21}\right) \cdot \left(B_{11} + B_{12}\right) \; \; \; \; &}
     \end{align*}
-\end{frame}
-
-\begin{frame}{Strassens Algorithmus --- Analyse}
-    Aufgestellte Rekurrenzgleichung:
-    \[ T(n) =  \begin{cases*}
-                    \Theta(1) & \text{n $\leq$ 1,} \\
-                    7 \cdot T\left(\frac{n}{2}\right) + \Theta(n^2) & \text{n $\geq$ 1} 
-                \end{cases*}
-    \]
-    \onslide<2->{
-    \begin{itemize}
-        \item  Wenn $f(n) \in \mathcal{O}(n^{log_b\;a-\eps}) $ für ein $\eps$ $>$ $0$, dann gilt $T(n) \in \Theta(n^{log_b\;a})$
-    \end{itemize}
+    \onslide<7-> {
     \begin{align*}
-        a = 7,\;b = 2,\;f(n) \in \Theta(n^{2}) & \onslide<3->{\Rightarrow n^{log_b\;a} = n^{log_2\;7} = n^{lg\;7} \\}
-        \onslide<4->{(\text{es gilt }2,80 < lg\;7 < 2,81)& \Rightarrow f(n) \in \mathcal{O}(n^{lg\;7-\eps}) \text{ mit } \eps = 0,8\\}
-        \onslide<5->{& \Rightarrow T(n) \in \Theta(n^{log_b\;a}) = \Theta(n^{log_2\;7}) = \Theta(n^{lg\;7})}
-    \end{align*}
-    \onslide<6->{$\rightarrow$ Verbesserung von von $\Theta(n^{3})$ auf $\Theta(n^{lg\;7}) = \Theta(n^{2,81})$!}
+            C =
+            \left(\begin{array}{cc}
+                P_{4} + P_{5} + P_{6} - P_{2} & P_{1} + P_{2} \\
+                P_{3} + P_{4} & P_{1} + P_{5} - P_{3} - P_{7} 
+            \end{array}\right)
+        \end{align*}
     }
 \end{frame}
 
+
 \begin{frame}{Strassens Algorithmus --- Endergebnis}
-Dann gilt für das Produkt $A\cdot B = C$:
+Behauptung: Es gilt $A\cdot B = C$:
 \uncover<+-> {
 \alt<1> {
         \begin{align*}
@@ -387,9 +380,9 @@ Dann gilt für das Produkt $A\cdot B = C$:
             \end{align*}
         
             \begin{align*}
-                A_{22} \cdot B_{21} - A_{22} \cdot B_{11} + A_{11} \cdot B_{11} + A_{11} \cdot B_{22} \\ 
+                \highlight{A_{22} \cdot B_{21}} - A_{22} \cdot B_{11} + A_{11} \cdot B_{11} + A_{11} \cdot B_{22} \\ 
                 + A_{22} \cdot B_{11} + A_{22} \cdot B_{22} + A_{12} \cdot B_{21} + A_{12} \cdot B_{22} \\ 
-                - A_{22} \cdot B_{21} - A_{22} \cdot B_{22} - A_{11} \cdot B_{22} - A_{12} \cdot B_{22} \\
+                - \highlight{A_{22} \cdot B_{21}} - A_{22} \cdot B_{22} - A_{11} \cdot B_{22} - A_{12} \cdot B_{22} \\
                 \;= &\;A_{11} \cdot B_{11} + A_{12} \cdot B_{21}
             \end{align*}} {
         \alt<3> {
@@ -402,8 +395,8 @@ Dann gilt für das Produkt $A\cdot B = C$:
             \end{align*}
             
             \begin{align*}
-                \hcancel[red]{A_{22} \cdot B_{21}} - A_{22} \cdot B_{11} + A_{11} \cdot B_{11} + A_{11} \cdot B_{22} & \\ 
-                + A_{22} \cdot B_{11} + A_{22} \cdot B_{22} + A_{12} \cdot B_{21} + A_{12} \cdot B_{22} & \\ 
+                \hcancel[red]{A_{22} \cdot B_{21}} - \highlight{A_{22} \cdot B_{11}} + A_{11} \cdot B_{11} + A_{11} \cdot B_{22} & \\ 
+                + \highlight{A_{22} \cdot B_{11}} + A_{22} \cdot B_{22} + A_{12} \cdot B_{21} + A_{12} \cdot B_{22} & \\ 
                 - \hcancel[red]{A_{22} \cdot B_{21}} - A_{22} \cdot B_{22} - A_{11} \cdot B_{22} - A_{12} \cdot B_{22} & \\
                 \;= &\;A_{11} \cdot B_{11} + A_{12} \cdot B_{21}
             \end{align*}}{
@@ -416,9 +409,9 @@ Dann gilt für das Produkt $A\cdot B = C$:
                     \end{array}\right)
                 \end{align*}
                 \begin{align*}
-                    \hcancel[red]{A_{22} \cdot B_{21}} - \hcancel[red]{A_{22} \cdot B_{11}} + A_{11} \cdot B_{11} + A_{11} \cdot B_{22} & \\ 
+                    \hcancel[red]{A_{22} \cdot B_{21}} - \hcancel[red]{A_{22} \cdot B_{11}} + A_{11} \cdot B_{11} + \highlight{A_{11} \cdot B_{22}} & \\ 
                     + \hcancel[red]{A_{22} \cdot B_{11}} + A_{22} \cdot B_{22} + A_{12} \cdot B_{21} + A_{12} \cdot B_{22} & \\ 
-                    - \hcancel[red]{A_{22} \cdot B_{21}} - A_{22} \cdot B_{22} - A_{11} \cdot B_{22} - A_{12} \cdot B_{22} & \\
+                    - \hcancel[red]{A_{22} \cdot B_{21}} - A_{22} \cdot B_{22} - \highlight{A_{11} \cdot B_{22}} - A_{12} \cdot B_{22} & \\
                     \;= &\;A_{11} \cdot B_{11} + A_{12} \cdot B_{21}
                 \end{align*}}{
             \alt<5>{
@@ -431,8 +424,8 @@ Dann gilt für das Produkt $A\cdot B = C$:
                 \end{align*}
                 \begin{align*}
                     \hcancel[red]{A_{22} \cdot B_{21}} - \hcancel[red]{A_{22} \cdot B_{11}} + A_{11} \cdot B_{11} + \hcancel[red]{A_{11} \cdot B_{22}} & \\ 
-                    + \hcancel[red]{A_{22} \cdot B_{11}} + A_{22} \cdot B_{22} + A_{12} \cdot B_{21} + A_{12} \cdot B_{22} & \\ 
-                    - \hcancel[red]{A_{22} \cdot B_{21}} - A_{22} \cdot B_{22} - \hcancel[red]{A_{11} \cdot B_{22}} - A_{12} \cdot B_{22} & \\
+                    + \hcancel[red]{A_{22} \cdot B_{11}} + \highlight{A_{22} \cdot B_{22}} + A_{12} \cdot B_{21} + A_{12} \cdot B_{22} & \\ 
+                    - \hcancel[red]{A_{22} \cdot B_{21}} - \highlight{A_{22} \cdot B_{22}} - \hcancel[red]{A_{11} \cdot B_{22}} - A_{12} \cdot B_{22} & \\
                     \;= &\;A_{11} \cdot B_{11} + A_{12} \cdot B_{21}
                 \end{align*}} {
                 \alt<6>{
@@ -445,8 +438,8 @@ Dann gilt für das Produkt $A\cdot B = C$:
                     \end{align*}
                     \begin{align*}
                         \hcancel[red]{A_{22} \cdot B_{21}} - \hcancel[red]{A_{22} \cdot B_{11}} + A_{11} \cdot B_{11} + \hcancel[red]{A_{11} \cdot B_{22}} & \\ 
-                        + \hcancel[red]{A_{22} \cdot B_{11}} + \hcancel[red]{A_{22} \cdot B_{22}} + A_{12} \cdot B_{21} + A_{12} \cdot B_{22} & \\ 
-                        - \hcancel[red]{A_{22} \cdot B_{21}} - \hcancel[red]{A_{22} \cdot B_{22}} - \hcancel[red]{A_{11} \cdot B_{22}} - A_{12} \cdot B_{22} & \\
+                        + \hcancel[red]{A_{22} \cdot B_{11}} + \hcancel[red]{A_{22} \cdot B_{22}} + A_{12} \cdot B_{21} + \highlight{A_{12} \cdot B_{22}} & \\ 
+                        - \hcancel[red]{A_{22} \cdot B_{21}} - \hcancel[red]{A_{22} \cdot B_{22}} - \hcancel[red]{A_{11} \cdot B_{22}} - \highlight{A_{12} \cdot B_{22}} & \\
                         \;= &\;A_{11} \cdot B_{11} + A_{12} \cdot B_{21}
                     \end{align*}} { 
                 \alt<7> {\begin{align*}
@@ -477,8 +470,8 @@ Dann gilt für das Produkt $A\cdot B = C$:
                     \end{array}\right)
                 \end{align*}
                 \begin{align*}
-                A_{11} \cdot B_{12} - A_{11} \cdot B_{22} \\ 
-                + A_{11} \cdot B_{22} + A_{12} \cdot B_{22} \\ 
+                A_{11} \cdot B_{12} - \highlight{A_{11} \cdot B_{22}} \\ 
+                + \highlight{A_{11} \cdot B_{22}} + A_{12} \cdot B_{22} \\ 
                 \;= &\;A_{11} \cdot B_{12} + A_{12} \cdot B_{22}
                 \end{align*}}{
                 \alt<10> {\begin{align*}
@@ -501,8 +494,8 @@ Dann gilt für das Produkt $A\cdot B = C$:
                     \end{array}\right)
                 \end{align*}
                 \begin{align*}
-                A_{21} \cdot B_{11} + A_{22} \cdot B_{11} \\ 
-                + A_{22} \cdot B_{21} - A_{22} \cdot B_{11} \\ 
+                A_{21} \cdot B_{11} + \highlight{A_{22} \cdot B_{11}} \\ 
+                + A_{22} \cdot B_{21} - \highlight{A_{22} \cdot B_{11}} \\ 
                 \;= &\;A_{21} \cdot B_{11} + A_{22} \cdot B_{21}
                 \end{align*}}{\alt<12>{\begin{align*}
                     A\cdot B =
@@ -524,9 +517,9 @@ Dann gilt für das Produkt $A\cdot B = C$:
             \end{align*}
         
             \begin{align*}
-                A_{11} \cdot B_{12} - A_{11} \cdot B_{22} + A_{11} \cdot B_{11} + A_{11} \cdot B_{22} \\ 
+                \highlight{A_{11} \cdot B_{12}} - A_{11} \cdot B_{22} + A_{11} \cdot B_{11} + A_{11} \cdot B_{22} \\ 
                 + A_{22} \cdot B_{11} + A_{22} \cdot B_{22} - A_{21} \cdot B_{11} - A_{22} \cdot B_{11} \\ 
-                - A_{11} \cdot B_{11} - A_{11} \cdot B_{12} + A_{21} \cdot B_{11} + A_{21} \cdot B_{12} \\
+                - A_{11} \cdot B_{11} - \highlight{A_{11} \cdot B_{12}} + A_{21} \cdot B_{11} + A_{21} \cdot B_{12} \\
                 \;= &\;A_{21} \cdot B_{12} + A_{22} \cdot B_{22}
             \end{align*}}{
             \alt<14>{
@@ -539,7 +532,7 @@ Dann gilt für das Produkt $A\cdot B = C$:
                 \end{align*}
             
                 \begin{align*}
-                    \hcancel[red]{A_{11} \cdot B_{12}} - A_{11} \cdot B_{22} + A_{11} \cdot B_{11} + A_{11} \cdot B_{22} \\ 
+                    \hcancel[red]{A_{11} \cdot B_{12}} - \highlight{A_{11} \cdot B_{22}} + A_{11} \cdot B_{11} + \highlight{A_{11} \cdot B_{22}} \\ 
                     + A_{22} \cdot B_{11} + A_{22} \cdot B_{22} - A_{21} \cdot B_{11} - A_{22} \cdot B_{11} \\ 
                     - A_{11} \cdot B_{11} - \hcancel[red]{A_{11} \cdot B_{12}} + A_{21} \cdot B_{11} + A_{21} \cdot B_{12} \\
                     \;= &\;A_{21} \cdot B_{12} + A_{22} \cdot B_{22}
@@ -554,9 +547,9 @@ Dann gilt für das Produkt $A\cdot B = C$:
                 \end{align*}
             
                 \begin{align*}
-                    \hcancel[red]{A_{11} \cdot B_{12}} - \hcancel[red]{A_{11} \cdot B_{22}} + A_{11} \cdot B_{11} + \hcancel[red]{A_{11} \cdot B_{22}} \\ 
+                    \hcancel[red]{A_{11} \cdot B_{12}} - \hcancel[red]{A_{11} \cdot B_{22}} + \highlight{A_{11} \cdot B_{11}} + \hcancel[red]{A_{11} \cdot B_{22}} \\ 
                     + A_{22} \cdot B_{11} + A_{22} \cdot B_{22} - A_{21} \cdot B_{11} - A_{22} \cdot B_{11} \\ 
-                    - A_{11} \cdot B_{11} - \hcancel[red]{A_{11} \cdot B_{12}} + A_{21} \cdot B_{11} + A_{21} \cdot B_{12} \\
+                    - \highlight{A_{11} \cdot B_{11}} - \hcancel[red]{A_{11} \cdot B_{12}} + A_{21} \cdot B_{11} + A_{21} \cdot B_{12} \\
                     \;= &\;A_{21} \cdot B_{12} + A_{22} \cdot B_{22}
                 \end{align*}}{
                 \alt<16>{\begin{align*}
@@ -569,7 +562,7 @@ Dann gilt für das Produkt $A\cdot B = C$:
             
                 \begin{align*}
                     \hcancel[red]{A_{11} \cdot B_{12}} - \hcancel[red]{A_{11} \cdot B_{22}} + \hcancel[red]{A_{11} \cdot B_{11}} + \hcancel[red]{A_{11} \cdot B_{22}} \\ 
-                    + A_{22} \cdot B_{11} + A_{22} \cdot B_{22} - A_{21} \cdot B_{11} - A_{22} \cdot B_{11} \\ 
+                    + \highlight{A_{22} \cdot B_{11}} + A_{22} \cdot B_{22} - A_{21} \cdot B_{11} - \highlight{A_{22} \cdot B_{11}} \\ 
                     - \hcancel[red]{A_{11} \cdot B_{11}} - \hcancel[red]{A_{11} \cdot B_{12}} + A_{21} \cdot B_{11} + A_{21} \cdot B_{12} \\
                     \;= &\;A_{21} \cdot B_{12} + A_{22} \cdot B_{22}
                 \end{align*}}{
@@ -584,8 +577,8 @@ Dann gilt für das Produkt $A\cdot B = C$:
             
                 \begin{align*}
                     \hcancel[red]{A_{11} \cdot B_{12}} - \hcancel[red]{A_{11} \cdot B_{22}} + \hcancel[red]{A_{11} \cdot B_{11}} + \hcancel[red]{A_{11} \cdot B_{22}} \\ 
-                    + \hcancel[red]{A_{22} \cdot B_{11}} + A_{22} \cdot B_{22} - A_{21} \cdot B_{11} - \hcancel[red]{A_{22} \cdot B_{11}} \\ 
-                    - \hcancel[red]{A_{11} \cdot B_{11}} - \hcancel[red]{A_{11} \cdot B_{12}} + A_{21} \cdot B_{11} + A_{21} \cdot B_{12} \\
+                    + \hcancel[red]{A_{22} \cdot B_{11}} + A_{22} \cdot B_{22} - \highlight{A_{21} \cdot B_{11}} - \hcancel[red]{A_{22} \cdot B_{11}} \\ 
+                    - \hcancel[red]{A_{11} \cdot B_{11}} - \hcancel[red]{A_{11} \cdot B_{12}} + \highlight{A_{21} \cdot B_{11}} + A_{21} \cdot B_{12} \\
                     \;= &\;A_{21} \cdot B_{12} + A_{22} \cdot B_{22}
                 \end{align*}}{
                 \alt<18>{\begin{align*}
@@ -616,76 +609,78 @@ Dann gilt für das Produkt $A\cdot B = C$:
                     - \hcancel[red]{A_{11} \cdot B_{11}} - \hcancel[red]{A_{11} \cdot B_{12}} + \hcancel[red]{A_{21} \cdot B_{11}} + A_{21} \cdot B_{12} \\
                     \;= &\;A_{21} \cdot B_{12} + A_{22} \cdot B_{22}
                 \end{align*}
-                $\rightarrow$ "naive" Schulemethode $\Leftrightarrow$ DAC $\Leftrightarrow$ Strassens Algorithmus
+                $\rightarrow$ "naives" Verfahren $\Leftrightarrow$ DAC $\Leftrightarrow$ Strassens Algorithmus
 }}}}}}}}}}}}}}}}}}}
 \pause[19]
+\end{frame}
+
+\begin{frame}{Strassens Algorithmus --- Analyse}
+    Aufgestellte Rekurrenzgleichung:
+    \[ T(n) =  \begin{cases*}
+                    \Theta(1) & \text{n $\leq$ 1,} \\
+                    7 \cdot T\left(\frac{n}{2}\right) + \Theta(n^2) & \text{n $\geq$ 1} 
+                \end{cases*}
+    \]
+    \onslide<2->{
+    \begin{itemize}
+        \item  Wenn $f(n) \in \mathcal{O}(n^{log_b\;a-\eps}) $ für ein $\eps$ $>$ $0$, dann gilt $T(n) \in \Theta(n^{log_b\;a})$
+    \end{itemize}
+    \begin{align*}
+        a = 7,\;b = 2,\;f(n) \in \Theta(n^{2}) & \onslide<3->{\Rightarrow n^{log_b\;a} = n^{log_2\;7} = n^{lg\;7} \\}
+        \onslide<4->{(\text{es gilt }2,80 < lg\;7 < 2,81)& \Rightarrow f(n) \in \mathcal{O}(n^{lg\;7-\eps}) \text{ mit } \eps = 0,8\\}
+        \onslide<5->{& \Rightarrow T(n) \in \Theta(n^{log_b\;a}) = \Theta(n^{log_2\;7}) = \Theta(n^{lg\;7})}
+    \end{align*}
+    \onslide<6->{$\rightarrow$ Verbesserung von $\Theta(n^{3})$ auf $\Theta(n^{lg\;7}) = \Theta(n^{2,81})$!}
+    }
 \end{frame}
 
 \section{Bewertung}
 \begin{frame}{Bewertung}
 
-    \alt<1-2> {
-    \uncover<+-> {
+    \alt<1> {
         \begin{figure}[H]
             \centering
-            \begin{subfigure}[b]{0.4\textwidth}
-                \includegraphics[width=\textwidth]{128Without.PNG}
-                \caption{Ohne Basisfall-Modifikation}
-            \end{subfigure}
-            \begin{subfigure}[b]{0.4\textwidth}
-                \includegraphics[width=\textwidth]{128With.PNG}
-                \caption{Mit Basisfall-Modifikation}
-            \end{subfigure}
+            \includegraphics[width=\textwidth]{basisfallnot.png}
+            \caption{Basisfall n = 1}
         \end{figure}
-    }
-    \uncover<+-> {
-        \begin{figure}[H]
-            \centering
-            \begin{subfigure}[b]{0.4\textwidth}
-                \includegraphics[width=\textwidth]{256Without.PNG}
-                \caption{Ohne Basisfall-Modifikation}
-            \end{subfigure}
-            \begin{subfigure}[b]{0.4\textwidth}
-                \includegraphics[width=\textwidth]{256With.PNG}
-                \caption{Mit Basisfall-Modifikation}
-            \end{subfigure}
-        \end{figure}
-    }
     }{
-    
-    \uncover<3-> {
         \begin{figure}[H]
             \centering
-            \begin{subfigure}[b]{0.4\textwidth}
-                \includegraphics[width=\textwidth]{512Without.PNG}
-                \caption{Ohne Basisfall-Modifikation}
-            \end{subfigure}
-            \begin{subfigure}[b]{0.4\textwidth}
-                \includegraphics[width=\textwidth]{512With.PNG}
-                \caption{Mit Basisfall-Modifikation}
-            \end{subfigure}
+            \includegraphics[width=\textwidth]{basisfallmod.png}
+            \caption{Basisfall n = 32}
         \end{figure}
     }
-    \uncover<4-> {
-        \begin{figure}[H]
-            \centering
-            \begin{subfigure}[b]{0.4\textwidth}
-                \includegraphics[width=\textwidth]{1024Without.PNG}
-                \caption{Ohne Basisfall-Modifikation}
-            \end{subfigure}
-            \begin{subfigure}[b]{0.4\textwidth}
-                \includegraphics[width=\textwidth]{1024With.PNG}
-                \caption{Mit Basisfall-Modifikation}
-            \end{subfigure}
-        \end{figure}
-    }
-    }
-    \pause[4]
+    \pause[2]
+\end{frame}
+
+\begin{frame}{Behandelnde Algorithmen}
+    In diesem Vortrag zu behandelnde Algorithmen:
+    \begin{itemize}
+        \item \st{Der "naive" Algorithmus}
+        \begin{itemize}
+            \item $\Theta(n^3)$
+        \end{itemize}
+        \item \st{Divide-And-Conquer-Algorithmus}
+        \begin{itemize}
+            \item $\Theta(n^3)$
+        \end{itemize}
+        \item \st{Strassens Algorithmus}
+        \begin{itemize}
+            \item $\Theta(n^{2,81})$
+        \end{itemize}
+    \end{itemize}
 \end{frame}
 
 \section{Ausblick}
 \begin{frame}{Ausblick}
-    $\rightarrow$ Modifikation des Algorithmus notwendig
+    $\rightarrow$ Für allgemeine Matrizen:
+    
+    \qquad $\rightharpoonup$ Matrizen vergrößern auf $2^k \times 2^k$
+    
+    \qquad $\rightharpoonup$ Basisfall modifizieren
+    \bigskip
+    
+    $\rightarrow$ Modifikation des Algorithmus notwendig (Basisfall)
     \bigskip
     
     $\rightarrow$ Parallelismus machbar
@@ -693,7 +688,6 @@ Dann gilt für das Produkt $A\cdot B = C$:
     \bigskip
     $\rightarrow$ Coppersmith und Winograd in $O(n^{2,376})$
     
-    \bigskip
     \qquad $\rightharpoonup$ Sehr unpraktisch
 \end{frame}
 
