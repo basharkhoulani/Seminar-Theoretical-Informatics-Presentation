@@ -280,7 +280,7 @@ Beispiel: $\cdot: \mathbb{Z}^{n\times l} \times \mathbb{Z}^{l\times m} \rightarr
     Aufgestellte Rekurrenzgleichung:
     \[ T(n) =  \begin{cases*}
                     \Theta(1) & \text{n $\leq$ 1,} \\
-                    8 \cdot T\left(\frac{n}{2}\right) + \Theta(n^2) & \text{n $\geq$ 1} 
+                    8 \cdot T\left(\frac{n}{2}\right) + \Theta(n^2) & \text{n $>$ 1} 
                 \end{cases*}
     \]
     \onslide<2->{
@@ -360,16 +360,20 @@ Beispiel: $\cdot: \mathbb{Z}^{n\times l} \times \mathbb{Z}^{l\times m} \rightarr
 
 
 \begin{frame}{Strassens Algorithmus --- Endergebnis}
-Behauptung: Es gilt $A\cdot B = C$:
 \uncover<+-> {
 \alt<1> {
+Behauptung: Es gilt $A\cdot B = C$:
+
+\bigskip
+Beweis:
         \begin{align*}
             A\cdot B =
             \left(\begin{array}{cc}
                 P_{4} + P_{5} + P_{6} - P_{2} & P_{1} + P_{2} \\
                 P_{3} + P_{4} & P_{1} + P_{5} - P_{3} - P_{7} 
             \end{array}\right)
-        \end{align*}} {
+        \end{align*}
+        } {
         \alt<2> {
             \begin{align*}
                 A\cdot B =
@@ -594,7 +598,9 @@ Behauptung: Es gilt $A\cdot B = C$:
                     + \hcancel[red]{A_{22} \cdot B_{11}} + A_{22} \cdot B_{22} - \hcancel[red]{A_{21} \cdot B_{11}} - \hcancel[red]{A_{22} \cdot B_{11}} \\ 
                     - \hcancel[red]{A_{11} \cdot B_{11}} - \hcancel[red]{A_{11} \cdot B_{12}} + \hcancel[red]{A_{21} \cdot B_{11}} + A_{21} \cdot B_{12} \\
                     \;= &\;A_{21} \cdot B_{12} + A_{22} \cdot B_{22}
-                \end{align*}}{
+                \end{align*}
+                \qed
+                }{
                 \begin{align*}
                     A\cdot B =
                     \left(\begin{array}{cc}
@@ -609,6 +615,8 @@ Behauptung: Es gilt $A\cdot B = C$:
                     - \hcancel[red]{A_{11} \cdot B_{11}} - \hcancel[red]{A_{11} \cdot B_{12}} + \hcancel[red]{A_{21} \cdot B_{11}} + A_{21} \cdot B_{12} \\
                     \;= &\;A_{21} \cdot B_{12} + A_{22} \cdot B_{22}
                 \end{align*}
+                \qed
+                
                 $\rightarrow$ "naives" Verfahren $\Leftrightarrow$ DAC $\Leftrightarrow$ Strassens Algorithmus
 }}}}}}}}}}}}}}}}}}}
 \pause[19]
@@ -618,7 +626,7 @@ Behauptung: Es gilt $A\cdot B = C$:
     Aufgestellte Rekurrenzgleichung:
     \[ T(n) =  \begin{cases*}
                     \Theta(1) & \text{n $\leq$ 1,} \\
-                    7 \cdot T\left(\frac{n}{2}\right) + \Theta(n^2) & \text{n $\geq$ 1} 
+                    7 \cdot T\left(\frac{n}{2}\right) + \Theta(n^2) & \text{n > 1} 
                 \end{cases*}
     \]
     \onslide<2->{
@@ -626,9 +634,9 @@ Behauptung: Es gilt $A\cdot B = C$:
         \item  Wenn $f(n) \in \mathcal{O}(n^{log_b\;a-\eps}) $ für ein $\eps$ $>$ $0$, dann gilt $T(n) \in \Theta(n^{log_b\;a})$
     \end{itemize}
     \begin{align*}
-        a = 7,\;b = 2,\;f(n) \in \Theta(n^{2}) & \onslide<3->{\Rightarrow n^{log_b\;a} = n^{log_2\;7} = n^{lg\;7} \\}
-        \onslide<4->{(\text{es gilt }2,80 < lg\;7 < 2,81)& \Rightarrow f(n) \in \mathcal{O}(n^{lg\;7-\eps}) \text{ mit } \eps = 0,8\\}
-        \onslide<5->{& \Rightarrow T(n) \in \Theta(n^{log_b\;a}) = \Theta(n^{log_2\;7}) = \Theta(n^{lg\;7})}
+        a = 7,\;b = 2,\;f(n) \in \Theta(n^{2}) & \onslide<3->{\rightsquigarrow n^{log_b\;a} = n^{log_2\;7} = n^{lg\;7} \\}
+        \onslide<4->{(\text{es gilt }2,80 < lg\;7 < 2,81)& \rightsquigarrow f(n) \in \mathcal{O}(n^{lg\;7-\eps}) \text{ mit } \eps = 0,8\\}
+        \onslide<5->{& \rightsquigarrow T(n) \in \Theta(n^{log_b\;a}) = \Theta(n^{log_2\;7}) = \Theta(n^{lg\;7})}
     \end{align*}
     \onslide<6->{$\rightarrow$ Verbesserung von $\Theta(n^{3})$ auf $\Theta(n^{lg\;7}) = \Theta(n^{2,81})$!}
     }
@@ -640,13 +648,13 @@ Behauptung: Es gilt $A\cdot B = C$:
     \alt<1> {
         \begin{figure}[H]
             \centering
-            \includegraphics[width=\textwidth]{basisfallnot.png}
+            \includegraphics[width=\linewidth]{basisfallnot.png}
             \caption{Basisfall n = 1}
         \end{figure}
     }{
         \begin{figure}[H]
             \centering
-            \includegraphics[width=\textwidth]{basisfallmod.png}
+            \includegraphics[width=\linewidth]{basisfallmod.png}
             \caption{Basisfall n = 32}
         \end{figure}
     }
@@ -675,20 +683,21 @@ Behauptung: Es gilt $A\cdot B = C$:
 \begin{frame}{Ausblick}
     $\rightarrow$ Für allgemeine Matrizen:
     
-    \qquad $\rightharpoonup$ Matrizen vergrößern auf $2^k \times 2^k$
+    \qquad $\rightharpoonup$ Matrizen vergrößern auf nächstgrößeres $2^k \times 2^k$
     
-    \qquad $\rightharpoonup$ Basisfall modifizieren
+    \qquad $\rightharpoonup$ Fälle modifizieren
+    
     \bigskip
+    $\rightarrow$ Basisfall auf bestimmtes "Crossover" festlegen
     
-    $\rightarrow$ Modifikation des Algorithmus notwendig (Basisfall)
     \bigskip
-    
     $\rightarrow$ Parallelismus machbar
     
     \bigskip
-    $\rightarrow$ Coppersmith und Winograd in $O(n^{2,376})$
+    $\rightarrow$ Coppersmith und Winograd in $O(n^{2,376})$ \cite{10.5555/1614191}
     
-    \qquad $\rightharpoonup$ Sehr unpraktisch
+    \bigskip
+    $\rightarrow$ Algorithmus mit weniger als 7 Produkte existiert nicht \cite{https://doi.org/10.48550/arxiv.math/0407224}
 \end{frame}
 
 \section{Literatur}
