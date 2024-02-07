@@ -638,7 +638,7 @@ Beweis:
         \onslide<4->{(\text{es gilt }2,80 < lg\;7 < 2,81)& \rightsquigarrow f(n) \in \mathcal{O}(n^{lg\;7-\eps}) \text{ mit } \eps = 0,8\\}
         \onslide<5->{& \rightsquigarrow T(n) \in \Theta(n^{log_b\;a}) = \Theta(n^{log_2\;7}) = \Theta(n^{lg\;7})}
     \end{align*}
-    \onslide<6->{$\rightarrow$ Verbesserung von $\Theta(n^{3})$ auf $\Theta(n^{lg\;7}) = \Theta(n^{2,81})$!}
+    \onslide<6->{$\rightarrow$ Verbesserung von $\Theta(n^{3})$ auf $\Theta(n^{lg\;7})$!}
     }
 \end{frame}
 
@@ -680,24 +680,33 @@ Beweis:
 \end{frame}
 
 \section{Ausblick}
-\begin{frame}{Ausblick}
+\begin{frame}{Ausblick}\uncover<+-> {
+
     $\rightarrow$ Für allgemeine Matrizen:
     
     \qquad $\rightharpoonup$ Matrizen vergrößern auf nächstgrößeres $2^k \times 2^k$
     
-    \qquad $\rightharpoonup$ Fälle modifizieren
+    \qquad $\rightharpoonup$ Fälle modifizieren}
+    \uncover<+-> {
     
     \bigskip
     $\rightarrow$ Basisfall auf bestimmtes "Crossover" festlegen
     
     \bigskip
+    }
+    \uncover<+-> {
+    
     $\rightarrow$ Parallelismus machbar
-    
+    }
     \bigskip
+    \uncover<+-> {
+    
     $\rightarrow$ Coppersmith und Winograd in $O(n^{2,376})$ \cite{10.5555/1614191}
-    
+    }
     \bigskip
-    $\rightarrow$ Algorithmus mit weniger als 7 Produkte existiert nicht \cite{https://doi.org/10.48550/arxiv.math/0407224}
+    \uncover<+-> {
+    
+    $\rightarrow$ Algorithmus mit weniger als 7 Produkte existiert nicht \cite{https://doi.org/10.48550/arxiv.math/0407224}}
 \end{frame}
 
 \section{Literatur}
